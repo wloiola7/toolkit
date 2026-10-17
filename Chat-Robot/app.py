@@ -36,6 +36,11 @@ migrate = Migrate(app, db)
 # thirdly step to migrate:flask db upgrade
 
 
+@app.before_request
+def disable_http_requests():
+    return jsonify(message="Service disabled"), 503
+
+
 # Route for the homepage, returns the home.html page
 @app.route('/', methods=["GET"])
 def index():
@@ -118,12 +123,7 @@ def login():
 # This decorator handles the connect event when a client connects to the SocketIO server
 @socketio.on('connect')
 def handle_connect():
-    # Get the JWT token from the request arguments
-    token = request.args.get('token')
-    # Decode the JWT token to get the user ID
-    user_id = decode_token(token)
-    # Add the user ID to the connected_users dictionary, using the session ID as the key
-    connected_users[request.sid] = user_id['sub']
+    return False
 
 
 # This decorator handles the disconnect event when a client disconnects from the SocketIO server
